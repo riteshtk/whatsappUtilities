@@ -1,0 +1,22 @@
+runtime: python311
+env: standard
+
+instance_class: F1
+
+automatic_scaling:
+  min_instances: 1
+  max_instances: 10
+
+env_variables:
+  WHATSAPP_PHONE_NUMBER_ID: "your_phone_number_id"
+  WHATSAPP_ACCESS_TOKEN: "your_access_token"
+  WHATSAPP_WEBHOOK_VERIFY_TOKEN: "your_webhook_token"
+  WHATSAPP_API_BASE_URL: "https://graph.facebook.com/v18.0"
+  MEDIA_BASE_URL: "https://your-project.appspot.com"
+  HOST: "0.0.0.0"
+  PORT: "8080"
+  DEBUG: "False"
+
+handlers:
+- url: /.*
+  script: auto

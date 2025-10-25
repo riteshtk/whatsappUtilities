@@ -25,7 +25,13 @@ A comprehensive Python-based utility for sending and receiving WhatsApp messages
 
 ```bash
 git clone <your-repo-url>
-cd CommsUtlities
+cd whatsappUtilities
+```
+
+### 2. Create Virtual Environment
+```bash
+python3 -m venv venv
+source venv/bin/activate
 ```
 
 ### 2. Set Up Backend
@@ -219,7 +225,7 @@ curl -X GET "http://localhost:8000/api/messages/"
 ## 📁 Project Structure
 
 ```
-CommsUtlities/
+whatsappUtilities/
 ├── backend/
 │   ├── app/
 │   │   ├── __init__.py
