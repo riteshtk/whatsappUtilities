@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp API Tester</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .api-section {
+            margin-bottom: 40px;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .section-header {
+            background: #f8f9fa;
+            padding: 20px;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .section-content {
+            padding: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #25D366;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            width: 100%;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(37, 211, 102, 0.3);
+        }
+        
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .response {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #25D366;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .error {
+            border-left-color: #dc3545;
+            background: #f8d7da;
+        }
+        
+        .success {
+            border-left-color: #28a745;
+            background: #d4edda;
+        }
+        
+        .file-upload {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+        
+        .file-upload input[type="file"] {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+        
+        .file-upload-label {
+            display: block;
+            padding: 12px;
+            border: 2px dashed #25D366;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .file-upload-label:hover {
+            background: #f0f9f4;
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #e0e0e0;
+            margin-bottom: 30px;
+        }
+        
+        .tab {
+            padding: 15px 30px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .tab.active {
+            border-bottom-color: #25D366;
+            color: #25D366;
+            font-weight: 600;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .status-online {
+            background: #28a745;
+        }
+        
+        .status-offline {
+            background: #dc3545;
+        }
+        
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📱 WhatsApp API Tester</h1>
+            <p>Test all WhatsApp messaging endpoints with this interactive interface</p>
+        </div>
+        
+        <div class="content">
+            <div class="tabs">
+                <div class="tab active" onclick="showTab('send')">📤 Send Messages</div>
+                <div class="tab" onclick="showTab('receive')">📥 Receive Messages</div>
+                <div class="tab" onclick="showTab('upload')">📁 Upload Files</div>
+                <div class="tab" onclick="showTab('status')">🔧 Status</div>
+            </div>
+            
+            <!-- Send Messages Tab -->
+            <div id="send" class="tab-content active">
+                <div class="api-section">
+                    <div class="section-header">Send Text Message</div>
+                    <div class="section-content">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="phone">Phone Number (with country code, no +)</label>
+                                <input type="text" id="phone" placeholder="1234567890" value="1234567890">
+                            </div>
+                            <div class="form-group">
+                                <label for="text">Message Text</label>
+                                <input type="text" id="text" placeholder="Hello from API!" value="Hello from API!">
+                            </div>
+                        </div>
+                        <button class="btn" onclick="sendTextMessage()">Send Text Message</button>
+                        <div id="textResponse" class="response" style="display: none;"></div>
+                    </div>
+                </div>
+                
+                <div class="api-section">
+                    <div class="section-header">Send Media Message</div>
+                    <div class="section-content">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="mediaPhone">Phone Number</label>
+                                <input type="text" id="mediaPhone" placeholder="1234567890" value="1234567890">
+                            </div>
+                            <div class="form-group">
+                                <label for="mediaType">Media Type</label>
+                                <select id="mediaType">
+                                    <option value="image">Image</option>
+                                    <option value="document">Document</option>
+                                    <option value="audio">Audio</option>
+                                    <option value="video">Video</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="mediaUrl">Media URL</label>
+                            <input type="url" id="mediaUrl" placeholder="https://example.com/image.jpg" value="https://picsum.photos/400/300">
+                        </div>
+                        <div class="form-group">
+                            <label for="caption">Caption (Optional)</label>
+                            <input type="text" id="caption" placeholder="Check this out!">
+                        </div>
+                        <button class="btn" onclick="sendMediaMessage()">Send Media Message</button>
+                        <div id="mediaResponse" class="response" style="display: none;"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Receive Messages Tab -->
+            <div id="receive" class="tab-content">
+                <div class="api-section">
+                    <div class="section-header">Received Messages</div>
+                    <div class="section-content">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="limit">Limit</label>
+                                <input type="number" id="limit" value="10" min="1" max="100">
+                            </div>
+                            <div class="form-group">
+                                <label for="offset">Offset</label>
+                                <input type="number" id="offset" value="0" min="0">
+                            </div>
+                        </div>
+                        <button class="btn" onclick="getMessages()">Get Messages</button>
+                        <div id="messagesResponse" class="response" style="display: none;"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Upload Files Tab -->
+            <div id="upload" class="tab-content">
+                <div class="api-section">
+                    <div class="section-header">Upload Media File</div>
+                    <div class="section-content">
+                        <div class="form-group">
+                            <label>Select File</label>
+                            <div class="file-upload">
+                                <input type="file" id="fileInput" accept="image/*,audio/*,video/*,.pdf,.doc,.docx">
+                                <label for="fileInput" class="file-upload-label">
+                                    📁 Click to select file or drag and drop
+                                </label>
+                            </div>
+                        </div>
+                        <button class="btn" onclick="uploadFile()">Upload File</button>
+                        <div id="uploadResponse" class="response" style="display: none;"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Status Tab -->
+            <div id="status" class="tab-content">
+                <div class="api-section">
+                    <div class="section-header">API Status</div>
+                    <div class="section-content">
+                        <button class="btn" onclick="checkStatus()">Check API Status</button>
+                        <div id="statusResponse" class="response" style="display: none;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8000';
+        
+        function showTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            document.getElementById(tabName).classList.add('active');
+            
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+        }
+        
+        function showResponse(elementId, data, isError = false) {
+            const element = document.getElementById(elementId);
+            element.style.display = 'block';
+            element.textContent = JSON.stringify(data, null, 2);
+            element.className = `response ${isError ? 'error' : 'success'}`;
+        }
+        
+        async function sendTextMessage() {
+            const phone = document.getElementById('phone').value;
+            const text = document.getElementById('text').value;
+            
+            if (!phone || !text) {
+                showResponse('textResponse', { error: 'Phone number and text are required' }, true);
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/messages/send-text`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `to=${encodeURIComponent(phone)}&text=${encodeURIComponent(text)}`
+                });
+                
+                const data = await response.json();
+                showResponse('textResponse', data, !response.ok);
+            } catch (error) {
+                showResponse('textResponse', { error: error.message }, true);
+            }
+        }
+        
+        async function sendMediaMessage() {
+            const phone = document.getElementById('mediaPhone').value;
+            const mediaType = document.getElementById('mediaType').value;
+            const mediaUrl = document.getElementById('mediaUrl').value;
+            const caption = document.getElementById('caption').value;
+            
+            if (!phone || !mediaUrl) {
+                showResponse('mediaResponse', { error: 'Phone number and media URL are required' }, true);
+                return;
+            }
+            
+            try {
+                const formData = new FormData();
+                formData.append('to', phone);
+                formData.append('media_type', mediaType);
+                formData.append('media_url', mediaUrl);
+                if (caption) formData.append('caption', caption);
+                
+                const response = await fetch(`${API_BASE}/api/messages/send-media`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                showResponse('mediaResponse', data, !response.ok);
+            } catch (error) {
+                showResponse('mediaResponse', { error: error.message }, true);
+            }
+        }
+        
+        async function getMessages() {
+            const limit = document.getElementById('limit').value;
+            const offset = document.getElementById('offset').value;
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/messages/?limit=${limit}&offset=${offset}`);
+                const data = await response.json();
+                showResponse('messagesResponse', data, !response.ok);
+            } catch (error) {
+                showResponse('messagesResponse', { error: error.message }, true);
+            }
+        }
+        
+        async function uploadFile() {
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                showResponse('uploadResponse', { error: 'Please select a file' }, true);
+                return;
+            }
+            
+            try {
+                const formData = new FormData();
+                formData.append('file', file);
+                
+                const response = await fetch(`${API_BASE}/api/messages/media/upload`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                showResponse('uploadResponse', data, !response.ok);
+            } catch (error) {
+                showResponse('uploadResponse', { error: error.message }, true);
+            }
+        }
+        
+        async function checkStatus() {
+            try {
+                const response = await fetch(`${API_BASE}/health`);
+                const data = await response.json();
+                showResponse('statusResponse', data, !response.ok);
+            } catch (error) {
+                showResponse('statusResponse', { error: 'API is not accessible' }, true);
+            }
+        }
+        
+        // File upload drag and drop
+        const fileUpload = document.querySelector('.file-upload');
+        const fileInput = document.getElementById('fileInput');
+        
+        fileUpload.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            fileUpload.style.background = '#f0f9f4';
+        });
+        
+        fileUpload.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            fileUpload.style.background = '';
+        });
+        
+        fileUpload.addEventListener('drop', (e) => {
+            e.preventDefault();
+            fileUpload.style.background = '';
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                fileInput.files = files;
+            }
+        });
+        
+        // Update file label when file is selected
+        fileInput.addEventListener('change', (e) => {
+            const label = document.querySelector('.file-upload-label');
+            if (e.target.files.length > 0) {
+                label.textContent = `📁 Selected: ${e.target.files[0].name}`;
+            } else {
+                label.textContent = '📁 Click to select file or drag and drop';
+            }
+        });
+    </script>
+</body>
+</html>
